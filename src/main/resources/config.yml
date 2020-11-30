@@ -1,0 +1,39 @@
+# To add tools to the enchanting category, please add the tool type name
+# found https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+# Please exclude material types. For example, pickaxe enchantments are under
+# the "PICKAXE" category.
+# Please use enchantments from: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+# If a material does not have a multiplier listed, the plugin will use 1
+enchanting:
+  block: ENCHANTING_TABLE
+  token_lore:
+    - 'This token is used to enchant items!'
+  PICKAXE:
+    DIG_SPEED:
+      max_level: 6
+      level_costs:
+        1: 1
+        2: 2
+        3: 5
+        4: 10
+        5: 25
+        6: 100
+    DURABILITY:
+      max_level: 6
+      level_costs:
+        1: 1
+        2: 2
+        3: 5
+        4: 10
+        5: 25
+        6: 100
+  SWORD:
+    DAMAGE_ALL:
+      max_level: 6
+      level_costs:
+        1: 1
+        2: 2
+        3: 5
+        4: 10
+        5: 25
+        6: 100
