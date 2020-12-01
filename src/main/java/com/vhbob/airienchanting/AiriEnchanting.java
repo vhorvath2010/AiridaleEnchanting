@@ -2,7 +2,9 @@ package com.vhbob.airienchanting;
 
 import com.vhbob.airienchanting.enchanter.EnchanterInteractions;
 import com.vhbob.airienchanting.enchanter.OpenEnchanter;
+import com.vhbob.airienchanting.enchanter.PurchaseEnchant;
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AiriEnchanting extends JavaPlugin {
@@ -15,9 +17,20 @@ public class AiriEnchanting extends JavaPlugin {
         saveDefaultConfig();
         Bukkit.getPluginManager().registerEvents(new OpenEnchanter(), this);
         Bukkit.getPluginManager().registerEvents(new EnchanterInteractions(), this);
+        Bukkit.getPluginManager().registerEvents(new PurchaseEnchant(), this);
     }
 
     public static AiriEnchanting getPlugin() {
         return plugin;
     }
+
+    public int getMulti(ItemStack item) {
+        for (String type : getConfig().getConfigurationSection("cost_multis").getKeys(false)) {
+            if (item.getType().toString().contains(type.toUpperCase() + "_")) {
+                return getConfig().getInt("cost_multis." + type);
+            }
+        }
+        return 1;
+    }
+
 }

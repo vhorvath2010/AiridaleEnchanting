@@ -8,7 +8,7 @@ enchanting:
   token_lore:
     - 'This token is used to enchant items!'
   PICKAXE:
-    DIG_SPEED:
+    efficiency:
       icon: GOLDEN_PICKAXE
       max_level: 5
       level_costs:
@@ -17,7 +17,7 @@ enchanting:
         3: 5
         4: 10
         5: 25
-    DURABILITY:
+    unbreaking:
       icon: ANVIL
       max_level: 5
       level_costs:
@@ -26,13 +26,13 @@ enchanting:
         3: 5
         4: 10
         5: 25
-    MENDING:
+    mending:
       icon: EXPERIENCE_BOTTLE
       max_level: 1
       level_costs:
         1: 25
   SWORD:
-    DAMAGE_ALL:
+    sharpness:
       icon: GOLDEN_SWORD
       max_level: 5
       level_costs:
