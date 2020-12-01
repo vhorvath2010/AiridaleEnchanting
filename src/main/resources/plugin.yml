@@ -4,3 +4,8 @@ main: com.vhbob.airienchanting.AiriEnchanting
 version: 1.0
 author: Vhbob
 api-version: 1.16
+commands:
+  ebook:
+    aliases: [enchantbook, ebookgive, giveebook]
+    permission: ebook.give
+    permission-message: &CYou do not have permission to do that!

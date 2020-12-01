@@ -1,27 +1,60 @@
 package com.vhbob.airienchanting.enchanter;
 
 import com.vhbob.airienchanting.AiriEnchanting;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
+
 public class EnchanterInteractions implements Listener {
 
     private static FileConfiguration config = AiriEnchanting.getPlugin().getConfig();
+    private static HashMap<Player, Block> interaction;
+
+    public EnchanterInteractions() {
+        interaction = new HashMap<Player, Block>();
+    }
 
     @EventHandler
-    public void onClick(InventoryClickEvent e) {
+    public void onOpen(PlayerInteractEvent e) {
+        if (e.getAction() != Action.LEFT_CLICK_BLOCK && e.getClickedBlock() != null &&
+                e.getClickedBlock().getType().toString().equalsIgnoreCase(AiriEnchanting.getPlugin().getConfig().getString("enchanting.block"))) {
+            // Create inventory and add fillers
+            Inventory enchanter = Bukkit.createInventory(null, 45, ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enchanter");
+            ItemStack purpleFiller = new ItemStack(Material.PURPLE_STAINED_GLASS_PANE, 1);
+            ItemStack magentaFiller = new ItemStack(Material.MAGENTA_STAINED_GLASS_PANE, 1);
+            for (int i = 0; i < enchanter.getSize(); ++i) {
+                if (i % 9 == 1) {
+                    enchanter.setItem(i, magentaFiller);
+                } else if (i % 9 < 3) {
+                    enchanter.setItem(i, purpleFiller);
+                }
+            }
+            enchanter.setItem(19, new ItemStack(Material.AIR, 1));
+            e.getPlayer().openInventory(enchanter);
+            interaction.put(e.getPlayer(), e.getClickedBlock());
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onUse(InventoryClickEvent e) {
         if (e.getView().getTitle().equals(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enchanter") && e.getClickedInventory() != null) {
             final Player p = (Player) e.getWhoClicked();
             if (e.getClick().isShiftClick() || (e.getClickedInventory().equals(e.getView().getTopInventory())) && e.getSlot() != 19) {
@@ -36,6 +69,15 @@ public class EnchanterInteractions implements Listener {
                     p.updateInventory();
                 }
             }.runTaskLater(AiriEnchanting.getPlugin(), 1);
+        }
+    }
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent e) {
+        if (e.getView().getTitle().equals(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enchanter")) {
+            if (e.getView().getTopInventory().getItem(19) != null)
+                e.getView().getBottomInventory().addItem(e.getView().getTopInventory().getItem(19));
+            interaction.remove((Player) e.getPlayer());
         }
     }
 
@@ -87,6 +129,8 @@ public class EnchanterInteractions implements Listener {
         }
     }
 
-
+    public static Block getClicked(Player p) {
+        return interaction.get(p);
+    }
 
 }

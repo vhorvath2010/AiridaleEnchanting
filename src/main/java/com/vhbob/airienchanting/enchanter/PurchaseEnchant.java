@@ -1,10 +1,10 @@
 package com.vhbob.airienchanting.enchanter;
 
 import com.vhbob.airienchanting.AiriEnchanting;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import com.vhbob.airienchanting.util.Utils;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -36,12 +36,21 @@ public class PurchaseEnchant implements Listener {
                 ItemStack playerItem = e.getView().getTopInventory().getItem(19);
                 if (cost > countTokens(playerInv)) {
                     e.getWhoClicked().sendMessage(ChatColor.RED + "You do not have enough tokens in your inventory!");
+                } else if (level - playerItem.getEnchantmentLevel(enchantment) > 1) {
+                    e.getWhoClicked().sendMessage(ChatColor.RED + "You must unlock the pervious level first!");
                 } else {
+                    // Add enchantment
                     removeTokens(playerInv, cost);
-                    playerItem.addEnchantment(enchantment, level);
+                    playerItem.addUnsafeEnchantment(enchantment, level);
                     e.getWhoClicked().sendMessage(ChatColor.GREEN + "Enchantment applied!");
+                    if (!AiriEnchanting.getPlugin().getConfig().getString("enchanting.sound").equalsIgnoreCase("none")){
+                    Sound sound = Sound.valueOf(AiriEnchanting.getPlugin().getConfig().getString("enchanting.sound"));
+                    e.getWhoClicked().getWorld().playSound(e.getWhoClicked().getEyeLocation(),
+                           sound, 1, 1);
+                    }
+                    Utils.particleEffects(Particle.SPELL, 25,
+                            EnchanterInteractions.getClicked((Player) e.getWhoClicked()).getLocation().add(0.5, -0.5, 0.5));
                 }
-                playerInv.addItem(playerItem);
                 e.getWhoClicked().closeInventory();
             }
         }

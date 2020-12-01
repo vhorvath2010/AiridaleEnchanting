@@ -1,9 +1,24 @@
+# This section is for cost multipliers
+# If a material does not have a multiplier listed, the plugin will use 1
+# Please use the material prefix, ex: "WOODEN" for wood
+cost_multis:
+  LEATHER: 1
+  WOODEN: 2
+  STONE: 3
+  IRON: 4
+  GOLD: 5
+  DIAMOND: 5
+  NETHERITE: 10
+
 # To add tools to the enchanting category, please add the tool type name
 # found https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
 # Please exclude material types. For example, pickaxe enchantments are under
 # the "PICKAXE" category.
-# Please use enchantments from: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+# Enchantment names are the same as the enchantment in game
+# Please use sounds from: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+# set a sound to "none" to remove it
 enchanting:
+  sound: ENTITY_PLAYER_LEVELUP
   block: ENCHANTING_TABLE
   token_lore:
     - 'This token is used to enchant items!'
@@ -42,14 +57,20 @@ enchanting:
         4: 10
         5: 25
 
-# This section is for cost multipliers
-# If a material does not have a multiplier listed, the plugin will use 1
-# Please use the material prefix, ex: "WOODEN" for wood
-cost_multis:
-  LEATHER: 1
-  WOODEN: 2
-  STONE: 3
-  IRON: 4
-  GOLD: 5
-  DIAMOND: 5
-  NETHERITE: 10
+# Below you can customize the enchantment books
+# In the lore section, you can use %cost% as a placeholder for the enchantment cost
+
+ebook:
+  name: '&5&lEnchanting Book'
+  lore:
+    - '&7Drop me on an item to enchant it!'
+    - '&7Cost: %cost% levels'
+  level_cost:
+    unbreaking:
+      valid:
+        - 'PICKAXE'
+        - 'SHOVEL'
+        - 'SWORD'
+      1: 5
+      2: 10
+      3: 20
