@@ -78,7 +78,9 @@ ebook:
 
 # Below is the section for disenchanting
 disenchanting:
-  title: '&C&L-={Disenchanter}=-'
+  title: '&4&L-={Disenchanter}=-'
+  safe_title: '&2&L-={Safe disenchant}=-'
+  unsafe_title: '&4&L-={Unsafe disenchant}=-'
   sound: BLOCK_ANVIL_BREAK
   block: GRINDSTONE
   safe:
@@ -93,4 +95,17 @@ disenchanting:
       - '&7Click this to take a risk!!'
       - '&7You may receive some enchantments back'
       - '&7but your item will be consumed!'
-  risk_icon: TNT
+  safe_confirm:
+    icon: RED_STAINED_GLASS_PANE
+    name: '&4&LCONFIRM DISENCHANT'
+    lore:
+      - '&7Clicking this will SAFELY disenchant'
+      - '&7the item in the slot to the left!'
+  unsafe_confirm:
+    icon: RED_STAINED_GLASS_PANE
+    name: '&4&LCONFIRM DISENCHANT'
+    lore:
+      - '&7Clicking this will UNSAFELY disenchant'
+      - '&7the item in the slot to the left!'
+      - '&7The item will be consumed, but you'
+      - '&7may receive enchantment books!'

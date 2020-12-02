@@ -9,15 +9,21 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class DisenchanterInteractions implements Listener {
 
-    private static FileConfiguration config = AiriEnchanting.getPlugin().getConfig();
-    private static String disenchanterTitle = ChatColor.translateAlternateColorCodes('&',
+    private static final FileConfiguration config = AiriEnchanting.getPlugin().getConfig();
+    private static final String disenchanterTitle = ChatColor.translateAlternateColorCodes('&',
             config.getString("disenchanting.title"));
+    private static final String safeTitle = ChatColor.translateAlternateColorCodes('&',
+            config.getString("disenchanting.safe_title"));
+    private static final String unsafeTitle = ChatColor.translateAlternateColorCodes('&',
+            config.getString("disenchanting.unsafe_title"));
+    private static final ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
 
     @EventHandler
     public void onOpen(PlayerInteractEvent e) {
@@ -28,7 +34,6 @@ public class DisenchanterInteractions implements Listener {
             // Add selectors
             ItemStack safe = Utils.getItem("disenchanting.safe");
             ItemStack unsafe = Utils.getItem("disenchanting.unsafe");
-            ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
             for (int i = 0; i < disenchanter.getSize(); ++i) {
                 disenchanter.setItem(i, filler);
             }
@@ -38,5 +43,38 @@ public class DisenchanterInteractions implements Listener {
             e.setCancelled(true);
         }
     }
+
+    @EventHandler
+    public void selectType(InventoryClickEvent e) {
+        // Check if they clicked a selector
+        if (e.getView().getTitle().equalsIgnoreCase(disenchanterTitle)) {
+            e.setCancelled(true);
+            if (e.getCurrentItem() != null) {
+                ItemStack safe = Utils.getItem("disenchanting.safe");
+                ItemStack unsafe = Utils.getItem("disenchanting.unsafe");
+                if (e.getCurrentItem().equals(safe)) {
+                    // Open safe disenchanting
+                    Inventory safeDisenchanter = Bukkit.createInventory(null, 9, safeTitle);
+                    for (int i = 0; i < 9; ++i) {
+                        if (i != 3)
+                            safeDisenchanter.setItem(i, filler);
+                    }
+                    safeDisenchanter.setItem(5, Utils.getItem("disenchanting.safe_confirm"));
+                    e.getWhoClicked().openInventory(safeDisenchanter);
+                } else if (e.getCurrentItem().equals(unsafe)) {
+                    // Open unsafe disenchanting
+                    Inventory unsafeDisenchanter = Bukkit.createInventory(null, 9, unsafeTitle);
+                    for (int i = 0; i < 9; ++i) {
+                        if (i != 3)
+                            unsafeDisenchanter.setItem(i, filler);
+                    }
+                    unsafeDisenchanter.setItem(5, Utils.getItem("disenchanting.unsafe_confirm"));
+                    e.getWhoClicked().openInventory(unsafeDisenchanter);
+                }
+            }
+        }
+    }
+
+
 
 }
