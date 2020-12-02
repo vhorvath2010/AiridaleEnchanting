@@ -109,3 +109,11 @@ disenchanting:
       - '&7the item in the slot to the left!'
       - '&7The item will be consumed, but you'
       - '&7may receive enchantment books!'
+  unsafe_odds:
+    LEATHER: 20
+    WOODEN: 20
+    STONE: 20
+    IRON: 40
+    GOLD: 50
+    DIAMOND: 75
+    NETHERITE: 100
