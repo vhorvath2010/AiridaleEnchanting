@@ -15,7 +15,9 @@ public class PurchaseEnchant implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enchanter")
+        String enchanterTitle = ChatColor.translateAlternateColorCodes('&',
+                AiriEnchanting.getPlugin().getConfig().getString("enchanting.title"));
+        if (e.getView().getTitle().equals(enchanterTitle)
                 && e.getClickedInventory() != null
                 && e.getClickedInventory().equals(e.getView().getTopInventory())
                 && e.getCurrentItem() != null

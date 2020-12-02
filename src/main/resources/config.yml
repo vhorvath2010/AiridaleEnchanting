@@ -18,6 +18,7 @@ cost_multis:
 # Please use sounds from: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
 # set a sound to "none" to remove it
 enchanting:
+  title: '&5&L-={Enchanter}=-'
   sound: ENTITY_PLAYER_LEVELUP
   block: ENCHANTING_TABLE
   token_lore:

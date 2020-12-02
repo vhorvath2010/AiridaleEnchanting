@@ -26,6 +26,7 @@ public class EnchanterInteractions implements Listener {
 
     private static FileConfiguration config = AiriEnchanting.getPlugin().getConfig();
     private static HashMap<Player, Block> interaction;
+    private static String enchanterTitle = ChatColor.translateAlternateColorCodes('&', config.getString("enchanting.title"));
 
     public EnchanterInteractions() {
         interaction = new HashMap<Player, Block>();
@@ -36,7 +37,7 @@ public class EnchanterInteractions implements Listener {
         if (e.getAction() != Action.LEFT_CLICK_BLOCK && e.getClickedBlock() != null &&
                 e.getClickedBlock().getType().toString().equalsIgnoreCase(AiriEnchanting.getPlugin().getConfig().getString("enchanting.block"))) {
             // Create inventory and add fillers
-            Inventory enchanter = Bukkit.createInventory(null, 45, ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enchanter");
+            Inventory enchanter = Bukkit.createInventory(null, 45, enchanterTitle);
             ItemStack purpleFiller = new ItemStack(Material.PURPLE_STAINED_GLASS_PANE, 1);
             ItemStack magentaFiller = new ItemStack(Material.MAGENTA_STAINED_GLASS_PANE, 1);
             for (int i = 0; i < enchanter.getSize(); ++i) {
@@ -55,7 +56,7 @@ public class EnchanterInteractions implements Listener {
 
     @EventHandler
     public void onUse(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enchanter") && e.getClickedInventory() != null) {
+        if (e.getView().getTitle().equals(enchanterTitle) && e.getClickedInventory() != null) {
             final Player p = (Player) e.getWhoClicked();
             if (e.getClick().isShiftClick() || (e.getClickedInventory().equals(e.getView().getTopInventory())) && e.getSlot() != 19) {
                 e.setCancelled(true);
@@ -74,7 +75,7 @@ public class EnchanterInteractions implements Listener {
 
     @EventHandler
     public void onClose(InventoryCloseEvent e) {
-        if (e.getView().getTitle().equals(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enchanter")) {
+        if (e.getView().getTitle().equals(enchanterTitle)) {
             if (e.getView().getTopInventory().getItem(19) != null)
                 e.getView().getBottomInventory().addItem(e.getView().getTopInventory().getItem(19));
             interaction.remove((Player) e.getPlayer());
