@@ -1,5 +1,6 @@
 package com.vhbob.airienchanting;
 
+import com.vhbob.airienchanting.disenchanting.DisenchanterInteractions;
 import com.vhbob.airienchanting.ebooks.GiveBook;
 import com.vhbob.airienchanting.ebooks.UseBook;
 import com.vhbob.airienchanting.enchanter.EnchanterInteractions;
@@ -19,6 +20,7 @@ public class AiriEnchanting extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new EnchanterInteractions(), this);
         Bukkit.getPluginManager().registerEvents(new PurchaseEnchant(), this);
         Bukkit.getPluginManager().registerEvents(new UseBook(), this);
+        Bukkit.getPluginManager().registerEvents(new DisenchanterInteractions(), this);
         Bukkit.getPluginCommand("ebook").setExecutor(new GiveBook());
     }
 

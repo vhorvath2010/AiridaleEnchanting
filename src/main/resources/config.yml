@@ -75,3 +75,22 @@ ebook:
       1: 5
       2: 10
       3: 20
+
+# Below is the section for disenchanting
+disenchanting:
+  title: '&C&L-={Disenchanter}=-'
+  sound: BLOCK_ANVIL_BREAK
+  block: GRINDSTONE
+  safe:
+    icon: GRINDSTONE
+    name: '&A&LSafely disenchant'
+    lore:
+      - '&7Click this to safely disenchant your item'
+  unsafe:
+    icon: TNT
+    name: '&C&LRisky disenchant!'
+    lore:
+      - '&7Click this to take a risk!!'
+      - '&7You may receive some enchantments back'
+      - '&7but your item will be consumed!'
+  risk_icon: TNT
