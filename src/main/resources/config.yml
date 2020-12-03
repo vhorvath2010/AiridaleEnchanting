@@ -117,3 +117,44 @@ disenchanting:
     GOLD: 50
     DIAMOND: 75
     NETHERITE: 100
+
+# Below is the section for repairing and renaming
+# Title is the title of the inventory, name is the name of the item
+repair_rename:
+  title: '&6&LSelect an option'
+  block: ANVIL
+repair:
+  title: '&6&L-={Repair}=-'
+  icon: ANVIL
+  name: '&6&LRepair'
+  lore:
+    - '&7Click this to open the repair menu'
+  costs:
+    LEATHER: 5
+    WOODEN: 5
+    STONE: 10
+    IRON: 15
+    GOLD: 20
+    DIAMOND: 30
+    NETHERITE: 50
+  confirm:
+    icon: LIME_STAINED_GLASS_PANE
+    name: '&2&LConfirm'
+    lore:
+      - '&7Click this to repair the item in'
+      - '&7the slot to the left!'
+      - '&7Cost: %cost% levels'
+rename:
+  title: '&6&L-={Rename}=-'
+  icon: NAME_TAG
+  name: '&6&LRename'
+  lore:
+    - '&7Click this to open the renaming menu'
+  cost: 10
+  confirm:
+    icon: LIME_STAINED_GLASS_PANE
+    name: '&2&LConfirm'
+    lore:
+      - '&7Click this to rename the item in'
+      - '&7the slot to the left!'
+      - '&7Cost: %cost% levels'

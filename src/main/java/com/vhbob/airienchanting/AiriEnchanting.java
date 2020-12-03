@@ -5,6 +5,7 @@ import com.vhbob.airienchanting.ebooks.GiveBook;
 import com.vhbob.airienchanting.ebooks.UseBook;
 import com.vhbob.airienchanting.enchanter.EnchanterInteractions;
 import com.vhbob.airienchanting.enchanter.PurchaseEnchant;
+import com.vhbob.airienchanting.repair_rename.RepairRenameInteractions;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +22,7 @@ public class AiriEnchanting extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PurchaseEnchant(), this);
         Bukkit.getPluginManager().registerEvents(new UseBook(), this);
         Bukkit.getPluginManager().registerEvents(new DisenchanterInteractions(), this);
+        Bukkit.getPluginManager().registerEvents(new RepairRenameInteractions(), this);
         Bukkit.getPluginCommand("ebook").setExecutor(new GiveBook());
     }
 
