@@ -129,7 +129,7 @@ repair:
   name: '&6&LRepair'
   lore:
     - '&7Click this to open the repair menu'
-  costs:
+  cost:
     LEATHER: 5
     WOODEN: 5
     STONE: 10

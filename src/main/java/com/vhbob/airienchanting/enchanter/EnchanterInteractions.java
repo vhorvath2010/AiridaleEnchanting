@@ -69,7 +69,7 @@ public class EnchanterInteractions implements Listener {
                 public void run() {
                     p.updateInventory();
                 }
-            }.runTaskLater(AiriEnchanting.getPlugin(), 1);
+            }.runTaskLater(AiriEnchanting.getPlugin(), 4);
         }
     }
 
