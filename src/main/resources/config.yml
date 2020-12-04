@@ -127,6 +127,7 @@ repair:
   title: '&6&L-={Repair}=-'
   icon: ANVIL
   name: '&6&LRepair'
+  sound: BLOCK_ANVIL_USE
   lore:
     - '&7Click this to open the repair menu'
   cost:
@@ -148,6 +149,8 @@ rename:
   title: '&6&L-={Rename}=-'
   icon: NAME_TAG
   name: '&6&LRename'
+  sound: BLOCK_ANVIL_USE
+  max_length: 40
   lore:
     - '&7Click this to open the renaming menu'
   cost: 10

@@ -5,12 +5,16 @@ import com.vhbob.airienchanting.util.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -19,17 +23,22 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class RepairRenameInteractions implements Listener {
 
-    private static final FileConfiguration config = AiriEnchanting.getPlugin().getConfig();
-    private static final ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-    private static final String chooseTitle = ChatColor.translateAlternateColorCodes('&', config.getString("repair_rename.title"));
-    private static final String repairTitle = ChatColor.translateAlternateColorCodes('&', config.getString("repair.title"));
-    private static final String renameTitle = ChatColor.translateAlternateColorCodes('&', config.getString("rename.title"));
-    private static final int renameCost = config.getInt("rename.cost");
+    private final FileConfiguration config = AiriEnchanting.getPlugin().getConfig();
+    private final ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+    private final String chooseTitle = ChatColor.translateAlternateColorCodes('&', config.getString("repair_rename.title"));
+    private final String repairTitle = ChatColor.translateAlternateColorCodes('&', config.getString("repair.title"));
+    private final String renameTitle = ChatColor.translateAlternateColorCodes('&', config.getString("rename.title"));
+    private final int renameCost = config.getInt("rename.cost");
+    private HashMap<Player, ItemStack> renaming;
 
+    public RepairRenameInteractions() {
+        renaming = new HashMap<Player, ItemStack>();
+    }
 
     @EventHandler
     public void openInv(PlayerInteractEvent e) {
@@ -92,6 +101,8 @@ public class RepairRenameInteractions implements Listener {
     @EventHandler
     public void repairActions(InventoryClickEvent e) {
         if (e.getView().getTitle().equalsIgnoreCase(repairTitle)) {
+            if (e.getClick().toString().contains("SHIFT"))
+                e.setCancelled(true);
             // Stop clicks outside of the player item slot
             if (e.getClickedInventory() != null && e.getClickedInventory().equals(e.getView().getTopInventory())) {
                 Inventory repairInv = e.getClickedInventory();
@@ -135,18 +146,85 @@ public class RepairRenameInteractions implements Listener {
                             }
                         }
                         cost *= getUsed(repairInv.getItem(3));
+                        // Repair if we can
                         if (p.getLevel() > cost) {
                             p.setLevel(p.getLevel() - cost);
                             damagedMeta.setDamage(0);
                             p.closeInventory();
                             playerItem.setItemMeta((ItemMeta) damagedMeta);
                             p.getInventory().addItem(playerItem);
+                            String soundText = config.getString("repair.sound");
+                            if (!soundText.equalsIgnoreCase("none")) {
+                                p.getWorld().playSound(p.getLocation(), Sound.valueOf(soundText), 1, 1);
+                            }
                         } else {
-                            p.sendMessage(ChatColor.RED + "You do not have enough levels!");
+                            p.sendMessage(ChatColor.RED + "You do not have enough levels to do that!");
                             p.closeInventory();
+                            p.getInventory().addItem(playerItem);
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void purchaseRename(InventoryClickEvent e) {
+        // Check if the user clicked the confirm button
+        Inventory renameInv = e.getView().getTopInventory();
+        if (e.getView().getTitle().equalsIgnoreCase(renameTitle) && e.getClickedInventory().equals(renameInv) && e.getSlot() != 3) {
+            e.setCancelled(true);
+            if (e.getSlot() == 5 && renameInv.getItem(3) != null) {
+                Player p = (Player) e.getWhoClicked();
+                ItemStack playerItem = renameInv.getItem(3);
+                // Complete the action if they have enough levels
+                if (p.getLevel() > renameCost) {
+                    if (playerItem.getType() != Material.AIR) {
+                        p.setLevel(p.getLevel() - renameCost);
+                        p.closeInventory();
+                        renaming.put(p, playerItem);
+                        p.sendMessage(ChatColor.GREEN + "Enter the item's new name in chat");
+                        if (p.hasPermission("rename.color")) {
+                            p.sendMessage(ChatColor.GREEN + "Color codes are enabled!");
+                        } else {
+                            p.sendMessage(ChatColor.RED + "Color codes are disabled!");
+                        }
+                    }
+                } else {
+                    p.closeInventory();
+                    p.getInventory().addItem(playerItem);
+                    p.sendMessage(ChatColor.RED + "You do not have enough levels to do that!");
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void renameItem(AsyncPlayerChatEvent e) {
+        // Complete rename
+        Player p = e.getPlayer();
+        if (renaming.containsKey(p)) {
+            e.setCancelled(true);
+            String name = e.getMessage();
+            // Ensure name is valid
+            if (name.length() <= config.getInt("rename.max_length")) {
+                ItemStack playerItem = renaming.get(p);
+                ItemMeta itemMeta = playerItem.getItemMeta();
+                if (p.hasPermission("rename.color")) {
+                    itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+                } else {
+                    itemMeta.setDisplayName(name);
+                }
+                playerItem.setItemMeta(itemMeta);
+                p.getInventory().addItem(playerItem);
+                renaming.remove(p);
+                p.sendMessage(ChatColor.GREEN + "Rename successful!");
+                String soundText = config.getString("rename.sound");
+                if (!soundText.equalsIgnoreCase("none")) {
+                    p.getWorld().playSound(p.getLocation(), Sound.valueOf(soundText), 1, 1);
+                }
+            } else {
+                p.sendMessage(ChatColor.RED + "That name is too long! Try again!");
             }
         }
     }
