@@ -5,9 +5,13 @@ import com.vhbob.airienchanting.ebooks.GiveBook;
 import com.vhbob.airienchanting.util.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,7 +20,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.EulerAngle;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DisenchanterInteractions implements Listener {
@@ -29,6 +36,11 @@ public class DisenchanterInteractions implements Listener {
     private static final String unsafeTitle = ChatColor.translateAlternateColorCodes('&',
             config.getString("disenchanting.unsafe_title"));
     private static final ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+    private static HashMap<Player, Block> clicked;
+
+    public DisenchanterInteractions() {
+        clicked = new HashMap<Player, Block>();
+    }
 
     @EventHandler
     public void onOpen(PlayerInteractEvent e) {
@@ -45,6 +57,7 @@ public class DisenchanterInteractions implements Listener {
             disenchanter.setItem(12, safe);
             disenchanter.setItem(14, unsafe);
             e.getPlayer().openInventory(disenchanter);
+            clicked.put(e.getPlayer(), e.getClickedBlock());
             e.setCancelled(true);
         }
     }
@@ -89,9 +102,9 @@ public class DisenchanterInteractions implements Listener {
                 if (e.getSlot() != 3)
                     e.setCancelled(true);
                 if (e.getSlot() == 5) {
-                    Player p = (Player) e.getWhoClicked();
+                    final Player p = (Player) e.getWhoClicked();
                     if (disenchanter.getItem(3) != null) {
-                        ItemStack playerItem = disenchanter.getItem(3);
+                        final ItemStack playerItem = disenchanter.getItem(3);
                         // Stop if no enchantments
                         if (playerItem.getEnchantments().size() == 0) {
                             p.closeInventory();
@@ -104,7 +117,14 @@ public class DisenchanterInteractions implements Listener {
                         for (Enchantment ench : playerItem.getEnchantments().keySet()) {
                             playerItem.removeEnchantment(ench);
                         }
-                        p.getInventory().addItem(playerItem);
+                        // Spawn animations
+                        Location animLoc = clicked.get(p).getLocation().add(0.5, -0.5, 0.5);
+                        playDisenchantEffect(animLoc, playerItem, 60);
+                        new BukkitRunnable() {
+                            public void run() {
+                                p.getInventory().addItem(playerItem);
+                            }
+                        }.runTaskLater(AiriEnchanting.getPlugin(), 30);
                         p.closeInventory();
                     }
                 }
@@ -121,7 +141,7 @@ public class DisenchanterInteractions implements Listener {
                 if (e.getSlot() != 3)
                     e.setCancelled(true);
                 if (e.getSlot() == 5) {
-                    Player p = (Player) e.getWhoClicked();
+                    final Player p = (Player) e.getWhoClicked();
                     if (disenchanter.getItem(3) != null) {
                         ItemStack playerItem = disenchanter.getItem(3);
                         // Stop if no enchantments
@@ -132,21 +152,62 @@ public class DisenchanterInteractions implements Listener {
                             return;
                         }
                         // Setup cool animation stuff
-                        // Remove enchantments
-                        Map<Enchantment, Integer> enchs = playerItem.getEnchantments();
-                        double chance = getChance(playerItem);
-                        for (Enchantment ench : enchs.keySet()) {
-                            ItemStack ebook = GiveBook.generateEBook(enchs.get(ench), ench);
-                            double roll = Math.random() * 100;
-                            if (roll < chance) {
-                                p.getInventory().addItem(ebook);
+                        Location animLoc = clicked.get(p).getLocation().add(0.5, -0.5, 0.5);
+                        playDisenchantEffect(animLoc, playerItem, 80);
+                        // Roll for enchantment books
+                        final Map<Enchantment, Integer> enchs = playerItem.getEnchantments();
+                        final double chance = getChance(playerItem);
+                        new BukkitRunnable() {
+                            public void run() {
+                                for (Enchantment ench : enchs.keySet()) {
+                                    ItemStack ebook = GiveBook.generateEBook(enchs.get(ench), ench);
+                                    double roll = Math.random() * 100;
+                                    if (roll < chance) {
+                                        p.getInventory().addItem(ebook);
+                                    }
+                                }
                             }
-                        }
+                        }.runTaskLater(AiriEnchanting.getPlugin(), 40);
                         p.closeInventory();
                     }
                 }
             }
         }
+    }
+
+    // Play the disenchantment effect at a given location
+    private void playDisenchantEffect(final Location loc, ItemStack itemStack, int delay) {
+        // Create rotating item
+        final ArmorStand stand = (ArmorStand) loc.getWorld().spawnEntity(loc.add(0, 0.5, 0), EntityType.ARMOR_STAND);
+        stand.getEquipment().setItemInMainHand(itemStack);
+        stand.setVisible(false);
+        stand.setInvulnerable(true);
+        stand.setGravity(false);
+        stand.setRightArmPose(new EulerAngle(4.6, 0, 0));
+        // Spin it
+        final int spin = new BukkitRunnable() {
+            public void run() {
+                Location loc = stand.getLocation();
+                float yaw = loc.getYaw();
+                yaw += 5;
+                stand.setRotation(yaw, 0);
+            }
+        }.runTaskTimer(AiriEnchanting.getPlugin(), 0, 1).getTaskId();
+        // Schedule removal
+        new BukkitRunnable() {
+            public void run() {
+                Bukkit.getScheduler().cancelTask(spin);
+                stand.remove();
+            }
+        }.runTaskLater(AiriEnchanting.getPlugin(), delay);
+        // Spawn lightning
+        new BukkitRunnable() {
+            public void run() {
+                for (int i = 0; i < 5; ++i) {
+                    loc.getWorld().strikeLightningEffect(loc);
+                }
+            }
+        }.runTaskLater(AiriEnchanting.getPlugin(), delay/ 2);
     }
 
     private double getChance(ItemStack item) {

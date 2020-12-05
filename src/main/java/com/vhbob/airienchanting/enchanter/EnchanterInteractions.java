@@ -117,7 +117,7 @@ public class EnchanterInteractions implements Listener {
                             } else {
                                 ItemStack lvlHas = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
                                 ItemMeta lvlHasIM = lvlHas.getItemMeta();
-                                lvlHasIM.setDisplayName(ChatColor.RED + "Level " + level + ": " + cost * multi + " tokens");
+                                lvlHasIM.setDisplayName(ChatColor.RED + "Level " + level + ": " + ChatColor.GRAY + cost * multi + " Tokens");
                                 lvlHas.setItemMeta(lvlHasIM);
                                 enchanter.setItem(row * 9 + 3 + level, lvlHas);
                             }
