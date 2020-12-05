@@ -124,7 +124,7 @@ public class DisenchanterInteractions implements Listener {
                             public void run() {
                                 p.getInventory().addItem(playerItem);
                             }
-                        }.runTaskLater(AiriEnchanting.getPlugin(), 30);
+                        }.runTaskLater(AiriEnchanting.getPlugin(), 60);
                         p.closeInventory();
                     }
                 }
@@ -163,11 +163,14 @@ public class DisenchanterInteractions implements Listener {
                                     ItemStack ebook = GiveBook.generateEBook(enchs.get(ench), ench);
                                     double roll = Math.random() * 100;
                                     if (roll < chance) {
+                                        p.sendMessage(ChatColor.GREEN + "You obtained a(n) " + ench.getKey().getKey() + " book!");
                                         p.getInventory().addItem(ebook);
+                                    } else {
+                                        p.sendMessage(ChatColor.RED + "The " + ench.getKey().getKey() + " enchantment disappeared!");
                                     }
                                 }
                             }
-                        }.runTaskLater(AiriEnchanting.getPlugin(), 40);
+                        }.runTaskLater(AiriEnchanting.getPlugin(), 80);
                         p.closeInventory();
                     }
                 }
@@ -207,7 +210,7 @@ public class DisenchanterInteractions implements Listener {
                     loc.getWorld().strikeLightningEffect(loc);
                 }
             }
-        }.runTaskLater(AiriEnchanting.getPlugin(), delay/ 2);
+        }.runTaskLater(AiriEnchanting.getPlugin(), delay);
     }
 
     private double getChance(ItemStack item) {

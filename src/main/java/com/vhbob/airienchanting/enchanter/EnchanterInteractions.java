@@ -27,6 +27,7 @@ public class EnchanterInteractions implements Listener {
     private static FileConfiguration config = AiriEnchanting.getPlugin().getConfig();
     private static HashMap<Player, Block> interaction;
     private static String enchanterTitle = ChatColor.translateAlternateColorCodes('&', config.getString("enchanting.title"));
+    private static ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1);
 
     public EnchanterInteractions() {
         interaction = new HashMap<Player, Block>();
@@ -40,6 +41,9 @@ public class EnchanterInteractions implements Listener {
             Inventory enchanter = Bukkit.createInventory(null, 45, enchanterTitle);
             ItemStack purpleFiller = new ItemStack(Material.PURPLE_STAINED_GLASS_PANE, 1);
             ItemStack magentaFiller = new ItemStack(Material.MAGENTA_STAINED_GLASS_PANE, 1);
+            for (int i = 0; i < enchanter.getSize(); ++i) {
+                enchanter.setItem(i, filler);
+            }
             for (int i = 0; i < enchanter.getSize(); ++i) {
                 if (i % 9 == 1) {
                     enchanter.setItem(i, magentaFiller);
@@ -58,12 +62,16 @@ public class EnchanterInteractions implements Listener {
     public void onUse(InventoryClickEvent e) {
         if (e.getView().getTitle().equals(enchanterTitle) && e.getClickedInventory() != null) {
             final Player p = (Player) e.getWhoClicked();
-            if (e.getClick().isShiftClick() || (e.getClickedInventory().equals(e.getView().getTopInventory())) && e.getSlot() != 19) {
+            if (e.getClickedInventory().equals(e.getView().getTopInventory()) && e.getSlot() != 19) {
                 e.setCancelled(true);
             }
             Inventory enchanter = e.getView().getTopInventory();
-            if (e.getSlot() == 19 && !e.getClick().isShiftClick()) {
+            if (e.getSlot() == 19) {
                 updateEnchantments(enchanter, e.getCursor());
+            } else if (e.getSlot() == 19 && e.getClick().isShiftClick() && e.getClickedInventory().equals(e.getView().getTopInventory())) {
+                updateEnchantments(enchanter, null);
+            } else if (e.getClick().isShiftClick() && e.getClickedInventory().equals(e.getView().getBottomInventory())) {
+                updateEnchantments(enchanter, e.getCurrentItem());
             }
             new BukkitRunnable() {
                 public void run() {
@@ -87,7 +95,7 @@ public class EnchanterInteractions implements Listener {
         if (item == null || item.getType() == Material.AIR) {
             for (int i = 0; i < enchanter.getSize(); ++i) {
                 if (i % 9 >= 3) {
-                    enchanter.setItem(i, new ItemStack(Material.AIR, 1));
+                    enchanter.setItem(i, filler);
                 }
             }
         } else {
