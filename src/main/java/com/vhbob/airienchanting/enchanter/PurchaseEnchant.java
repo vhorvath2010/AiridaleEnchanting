@@ -31,7 +31,7 @@ public class PurchaseEnchant implements Listener {
                 enchantKey = ChatColor.stripColor(enchantKey).toLowerCase();
                 Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantKey));
                 String costString = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
-                costString = costString.replace("Level " + level + ": ", "").replace(" tokens", "");
+                costString = costString.replace("Level " + level + ": ", "").replace(" Tokens", "");
                 int cost = Integer.parseInt(costString);
                 // Buy enchantment, if play can afford it
                 Inventory playerInv = e.getView().getBottomInventory();
