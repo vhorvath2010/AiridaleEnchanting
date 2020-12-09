@@ -36,7 +36,7 @@ public class UseBook implements Listener {
                         List<String> types = config.getStringList("ebook.level_cost." + id + ".valid");
                         boolean valid = false;
                         for (String type : types) {
-                            if (clicked.getType().toString().contains("_" + type.toUpperCase())) {
+                            if (clicked.getType().toString().contains("_" + type.toUpperCase()) || clicked.getType().toString().equalsIgnoreCase(type)) {
                                 valid = true;
                             }
                         }
