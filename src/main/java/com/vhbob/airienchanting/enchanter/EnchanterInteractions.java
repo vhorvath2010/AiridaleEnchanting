@@ -100,7 +100,7 @@ public class EnchanterInteractions implements Listener {
             }
         } else {
             for (String type : config.getConfigurationSection("enchanting").getKeys(false)) {
-                if (item.getType().toString().contains("_" + type.toUpperCase())) {
+                if (item.getType().toString().contains("_" + type.toUpperCase()) || item.getType().toString().equalsIgnoreCase(type)) {
                     // Added type's enchantments to the inventory
                     int row = 0;
                     for (String enchantment : config.getConfigurationSection("enchanting." + type).getKeys(false)) {
@@ -108,7 +108,7 @@ public class EnchanterInteractions implements Listener {
                         ItemStack icon = new ItemStack(iconType, 1);
                         ItemMeta im = icon.getItemMeta();
                         String enchantmentFormatted = enchantment.toUpperCase().charAt(0) + enchantment.substring(1).toLowerCase();
-                        im.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + enchantmentFormatted);
+                        im.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + enchantmentFormatted.replace("_", " "));
                         icon.setItemMeta(im);
                         enchanter.setItem(row * 9 + 3, icon);
                         // Add levels
@@ -116,6 +116,10 @@ public class EnchanterInteractions implements Listener {
                             int cost = config.getInt("enchanting." + type + "." + enchantment + ".level_costs." + level);
                             int multi = AiriEnchanting.getPlugin().getMulti(item);
                             Enchantment enchantmentEnum = Enchantment.getByKey(NamespacedKey.minecraft(enchantment.toLowerCase()));
+                            if (enchantmentEnum == null) {
+                                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Error: " + enchantment + " is not a valid enchantment!");
+                                return;
+                            }
                             if (item.getEnchantmentLevel(enchantmentEnum) >= level) {
                                 ItemStack lvlHas = new ItemStack(Material.LIME_STAINED_GLASS_PANE, 1);
                                 ItemMeta lvlHasIM = lvlHas.getItemMeta();
