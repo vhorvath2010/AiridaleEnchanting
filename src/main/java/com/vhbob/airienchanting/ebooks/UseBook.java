@@ -40,6 +40,21 @@ public class UseBook implements Listener {
                                 valid = true;
                             }
                         }
+                        for (String section : AiriEnchanting.getPlugin().getConfig().getConfigurationSection("exclusive_groups").getKeys(false)) {
+                            if (!valid)
+                                break;
+                            List<String> exclusive = AiriEnchanting.getPlugin().getConfig().getStringList("exclusive_groups." + section);
+                            // Check if the given enchantment is in the list
+                            if (exclusive.contains(id)) {
+                                for (Enchantment itemEnchant : clicked.getEnchantments().keySet()) {
+                                    if (exclusive.contains(itemEnchant.getKey().getKey())) {
+                                        valid = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        // Buy enchantment, if play can afford it
                         if (!valid || enchants.get(enchantment) < clicked.getEnchantmentLevel(enchantment)) {
                             p.sendMessage(ChatColor.RED + "That book can not be used on that item!");
                             return;

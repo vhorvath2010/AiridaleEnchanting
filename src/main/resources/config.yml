@@ -10,6 +10,16 @@ cost_multis:
   DIAMOND: 5
   NETHERITE: 10
 
+# This section of the config contains enchantment groups that are mutually exclusive
+exclusive_groups:
+  1:
+    - smite
+    - sharpness
+    - bane_of_arthropods
+  2:
+    - fortune
+    - silk_touch
+
 # To add tools to the enchanting category, please add the tool type name
 # found https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
 # Please exclude material types. For example, pickaxe enchantments are under
@@ -33,6 +43,18 @@ enchanting:
         3: 5
         4: 10
         5: 25
+    fortune:
+      icon: GOLDEN_PICKAXE
+      max_level: 3
+      level_costs:
+        1: 1
+        2: 2
+        3: 5
+    silk_touch:
+      icon: GOLDEN_PICKAXE
+      max_level: 1
+      level_costs:
+        1: 1
     unbreaking:
       icon: ANVIL
       max_level: 5
@@ -75,6 +97,14 @@ ebook:
       1: 5
       2: 10
       3: 20
+    fortune:
+      valid:
+        - 'PICKAXE'
+      1: 5
+    silk_touch:
+      valid:
+        - 'PICKAXE'
+      1: 15
 
 # Below is the section for disenchanting
 disenchanting:

@@ -11,6 +11,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public class PurchaseEnchant implements Listener {
 
     @EventHandler
@@ -27,16 +29,34 @@ public class PurchaseEnchant implements Listener {
             if (e.getCurrentItem().getType() != Material.AIR && e.getSlot() % 9 > 3) {
                 // Get enchantment info
                 int level = e.getSlot() % 9 - 3;
-                String enchantKey = e.getView().getTopInventory().getItem(e.getSlot() - level).getItemMeta().getDisplayName();
+                String enchantKey = e.getView().getTopInventory().getItem(e.getSlot() - level).getItemMeta().getDisplayName().replace(" ", "_");
                 enchantKey = ChatColor.stripColor(enchantKey).toLowerCase();
                 Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantKey));
                 String costString = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
                 costString = costString.replace("Level " + level + ": ", "").replace(" Tokens", "");
                 int cost = Integer.parseInt(costString);
-                // Buy enchantment, if play can afford it
+                // Ensure they do not have any mutually exclusive enchants
                 Inventory playerInv = e.getView().getBottomInventory();
                 ItemStack playerItem = e.getView().getTopInventory().getItem(19);
-                if (cost > countTokens(playerInv)) {
+                boolean cancelled = false;
+                for (String section : AiriEnchanting.getPlugin().getConfig().getConfigurationSection("exclusive_groups").getKeys(false)) {
+                    List<String> exclusive = AiriEnchanting.getPlugin().getConfig().getStringList("exclusive_groups." + section);
+                    // Check if the given enchantment is in the list
+                    if (exclusive.contains(enchantKey)) {
+                        for (Enchantment itemEnchant : playerItem.getEnchantments().keySet()) {
+                            if (exclusive.contains(itemEnchant.getKey().getKey())) {
+                                cancelled = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (cancelled)
+                        break;
+                }
+                // Buy enchantment, if play can afford it
+                if (cancelled) {
+                    e.getWhoClicked().sendMessage(ChatColor.RED + "Your item has a mutually exclusive enchantment! This enchantment may not be added.");
+                } else if (cost > countTokens(playerInv)) {
                     e.getWhoClicked().sendMessage(ChatColor.RED + "You do not have enough tokens in your inventory!");
                 } else if (level - playerItem.getEnchantmentLevel(enchantment) > 1) {
                     e.getWhoClicked().sendMessage(ChatColor.RED + "You must unlock the pervious level first!");

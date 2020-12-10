@@ -112,7 +112,6 @@ public class DisenchanterInteractions implements Listener {
                             e.getWhoClicked().getInventory().addItem(playerItem);
                             return;
                         }
-                        // Setup cool animation stuff
                         // Remove enchantments
                         for (Enchantment ench : playerItem.getEnchantments().keySet()) {
                             playerItem.removeEnchantment(ench);
@@ -166,7 +165,7 @@ public class DisenchanterInteractions implements Listener {
                                         p.sendMessage(ChatColor.GREEN + "You obtained a(n) " + ench.getKey().getKey() + " book!");
                                         p.getInventory().addItem(ebook);
                                     } else {
-                                        p.sendMessage(ChatColor.RED + "The " + ench.getKey().getKey() + " enchantment disappeared!");
+                                        p.sendMessage(ChatColor.RED + "The " + ench.getKey().getKey().replace("_", " ") + " enchantment disappeared!");
                                     }
                                 }
                             }
