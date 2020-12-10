@@ -44,7 +44,8 @@ public class PurchaseEnchant implements Listener {
                     // Check if the given enchantment is in the list
                     if (exclusive.contains(enchantKey)) {
                         for (Enchantment itemEnchant : playerItem.getEnchantments().keySet()) {
-                            if (exclusive.contains(itemEnchant.getKey().getKey())) {
+                            String itemEnchantKey = itemEnchant.getKey().getKey();
+                            if (!itemEnchantKey.equalsIgnoreCase(enchantKey) && exclusive.contains(itemEnchantKey)) {
                                 cancelled = true;
                                 break;
                             }

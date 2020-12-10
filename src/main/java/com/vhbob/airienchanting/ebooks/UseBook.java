@@ -47,7 +47,8 @@ public class UseBook implements Listener {
                             // Check if the given enchantment is in the list
                             if (exclusive.contains(id)) {
                                 for (Enchantment itemEnchant : clicked.getEnchantments().keySet()) {
-                                    if (exclusive.contains(itemEnchant.getKey().getKey())) {
+                                    String itemEnchantKey = itemEnchant.getKey().getKey();
+                                    if (!itemEnchantKey.equalsIgnoreCase(id) && exclusive.contains(itemEnchantKey)) {
                                         valid = false;
                                         break;
                                     }

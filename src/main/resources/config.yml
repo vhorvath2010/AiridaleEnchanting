@@ -33,6 +33,16 @@ enchanting:
   block: ENCHANTING_TABLE
   token_lore:
     - 'This token is used to enchant items!'
+  next_page:
+    icon: ARROW
+    name: '&A&LNext Page'
+    lore:
+      - '&7Click this to view the next page'
+  prev_page:
+    icon: ARROW
+    name: '&A&LPrevious Page'
+    lore:
+      - '&7Click this to view the previous page'
   PICKAXE:
     efficiency:
       icon: GOLDEN_PICKAXE
@@ -79,6 +89,43 @@ enchanting:
         3: 5
         4: 10
         5: 25
+    smite:
+      icon: GOLDEN_SWORD
+      max_level: 5
+      level_costs:
+        1: 1
+        2: 2
+        3: 5
+        4: 10
+        5: 25
+    bane_of_arthropods:
+      icon: GOLDEN_SWORD
+      max_level: 5
+      level_costs:
+        1: 1
+        2: 2
+        3: 5
+        4: 10
+        5: 25
+    unbreaking:
+      icon: ANVIL
+      max_level: 5
+      level_costs:
+        1: 1
+        2: 2
+        3: 5
+        4: 10
+        5: 25
+    mending:
+      icon: EXPERIENCE_BOTTLE
+      max_level: 1
+      level_costs:
+        1: 25
+    fire_aspect:
+      icon: BLAZE_POWDER
+      max_level: 1
+      level_costs:
+        1: 25
 
 # Below you can customize the enchantment books
 # In the lore section, you can use %cost% as a placeholder for the enchantment cost
