@@ -17,12 +17,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,9 +39,11 @@ public class DisenchanterInteractions implements Listener {
             config.getString("disenchanting.unsafe_title"));
     private static final ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
     private static HashMap<Player, Block> clicked;
+    private ArrayList<Player> avoidGive;
 
     public DisenchanterInteractions() {
         clicked = new HashMap<Player, Block>();
+        avoidGive = new ArrayList<Player>();
     }
 
     @EventHandler
@@ -109,7 +113,6 @@ public class DisenchanterInteractions implements Listener {
                         if (playerItem.getEnchantments().size() == 0) {
                             p.closeInventory();
                             p.sendMessage(ChatColor.RED + "That item has no enchantments on it!");
-                            e.getWhoClicked().getInventory().addItem(playerItem);
                             return;
                         }
                         // Remove enchantments
@@ -124,6 +127,7 @@ public class DisenchanterInteractions implements Listener {
                                 p.getInventory().addItem(playerItem);
                             }
                         }.runTaskLater(AiriEnchanting.getPlugin(), 60);
+                        avoidGive.add(p);
                         p.closeInventory();
                     }
                 }
@@ -147,7 +151,6 @@ public class DisenchanterInteractions implements Listener {
                         if (playerItem.getEnchantments().size() == 0) {
                             p.closeInventory();
                             p.sendMessage(ChatColor.RED + "That item has no enchantments on it!");
-                            e.getWhoClicked().getInventory().addItem(playerItem);
                             return;
                         }
                         // Setup cool animation stuff
@@ -170,10 +173,22 @@ public class DisenchanterInteractions implements Listener {
                                 }
                             }
                         }.runTaskLater(AiriEnchanting.getPlugin(), 80);
+                        avoidGive.add(p);
                         p.closeInventory();
                     }
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void saveItems(InventoryCloseEvent e) {
+        if (e.getView().getTitle().equalsIgnoreCase(unsafeTitle) || e.getView().getTitle().equalsIgnoreCase(safeTitle)) {
+            ItemStack pItem = e.getView().getTopInventory().getItem(3);
+            if (pItem != null && !avoidGive.contains(e.getPlayer())) {
+                e.getPlayer().getInventory().addItem(pItem);
+            }
+            avoidGive.remove(e.getPlayer());
         }
     }
 

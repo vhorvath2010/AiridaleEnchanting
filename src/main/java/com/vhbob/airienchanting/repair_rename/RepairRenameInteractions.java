@@ -14,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -152,7 +153,6 @@ public class RepairRenameInteractions implements Listener {
                             damagedMeta.setDamage(0);
                             p.closeInventory();
                             playerItem.setItemMeta((ItemMeta) damagedMeta);
-                            p.getInventory().addItem(playerItem);
                             String soundText = config.getString("repair.sound");
                             if (!soundText.equalsIgnoreCase("none")) {
                                 p.getWorld().playSound(p.getLocation(), Sound.valueOf(soundText), 1, 1);
@@ -160,7 +160,6 @@ public class RepairRenameInteractions implements Listener {
                         } else {
                             p.sendMessage(ChatColor.RED + "You do not have enough levels to do that!");
                             p.closeInventory();
-                            p.getInventory().addItem(playerItem);
                         }
                     }
                 }
@@ -181,7 +180,6 @@ public class RepairRenameInteractions implements Listener {
                 if (p.getLevel() > renameCost) {
                     if (playerItem.getType() != Material.AIR) {
                         p.setLevel(p.getLevel() - renameCost);
-                        p.closeInventory();
                         renaming.put(p, playerItem);
                         p.sendMessage(ChatColor.GREEN + "Enter the item's new name in chat");
                         if (p.hasPermission("rename.color")) {
@@ -189,10 +187,10 @@ public class RepairRenameInteractions implements Listener {
                         } else {
                             p.sendMessage(ChatColor.RED + "Color codes are disabled!");
                         }
+                        p.closeInventory();
                     }
                 } else {
                     p.closeInventory();
-                    p.getInventory().addItem(playerItem);
                     p.sendMessage(ChatColor.RED + "You do not have enough levels to do that!");
                 }
             }
@@ -225,6 +223,16 @@ public class RepairRenameInteractions implements Listener {
                 }
             } else {
                 p.sendMessage(ChatColor.RED + "That name is too long! Try again!");
+            }
+        }
+    }
+
+    @EventHandler
+    public void saveItems(InventoryCloseEvent e) {
+        if (e.getView().getTitle().equalsIgnoreCase(repairTitle) || e.getView().getTitle().equalsIgnoreCase(renameTitle)) {
+            ItemStack pItem = e.getView().getTopInventory().getItem(3);
+            if (pItem != null && !renaming.containsKey(e.getPlayer())) {
+                e.getPlayer().getInventory().addItem(pItem);
             }
         }
     }
