@@ -40,6 +40,8 @@ public class UseBook implements Listener {
                                 valid = true;
                             }
                         }
+                        // Check for mutually exclusive
+                        boolean mExcl = false;
                         for (String section : AiriEnchanting.getPlugin().getConfig().getConfigurationSection("exclusive_groups").getKeys(false)) {
                             if (!valid)
                                 break;
@@ -49,7 +51,7 @@ public class UseBook implements Listener {
                                 for (Enchantment itemEnchant : clicked.getEnchantments().keySet()) {
                                     String itemEnchantKey = itemEnchant.getKey().getKey();
                                     if (!itemEnchantKey.equalsIgnoreCase(id) && exclusive.contains(itemEnchantKey)) {
-                                        valid = false;
+                                        mExcl = true;
                                         break;
                                     }
                                 }
@@ -58,6 +60,10 @@ public class UseBook implements Listener {
                         // Buy enchantment, if play can afford it
                         if (!valid || enchants.get(enchantment) < clicked.getEnchantmentLevel(enchantment)) {
                             p.sendMessage(ChatColor.RED + "That book can not be used on that item!");
+                            return;
+                        }
+                        if (mExcl) {
+                            p.sendMessage(ChatColor.RED + "That enchantment conflicts with another already on this item!");
                             return;
                         }
                         // Ensure they have enough levels

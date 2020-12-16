@@ -100,70 +100,72 @@ public class RepairRenameInteractions implements Listener {
     }
 
     @EventHandler
-    public void repairActions(InventoryClickEvent e) {
+    public void repairActions(final InventoryClickEvent e) {
         if (e.getView().getTitle().equalsIgnoreCase(repairTitle)) {
-            if (e.getClick().toString().contains("SHIFT"))
-                e.setCancelled(true);
+            final Inventory repairInv = e.getView().getTopInventory();
+            final Player p = (Player) e.getWhoClicked();
             // Stop clicks outside of the player item slot
             if (e.getClickedInventory() != null && e.getClickedInventory().equals(e.getView().getTopInventory())) {
-                Inventory repairInv = e.getClickedInventory();
-                final Player p = (Player) e.getWhoClicked();
-                // Check if we need to update the lore cost
-                if (e.getSlot() == 3) {
-                    ItemStack newConfirm = Utils.getItem("repair.confirm");
+                if (e.getSlot() != 3)
+                    e.setCancelled(true);
+                // Update lore cost display
+                if (e.getSlot() == 5) {
+                    ItemStack playerItem = repairInv.getItem(3);
+                    if (playerItem == null || !playerItem.hasItemMeta() || !(playerItem.getItemMeta() instanceof Damageable)) {
+                        p.closeInventory();
+                        p.sendMessage(ChatColor.RED + "There is no item in the repair slot!");
+                        return;
+                    }
+                    ItemMeta meta = playerItem.getItemMeta();
+                    Damageable damagedMeta = (Damageable) meta;
                     int cost = 30;
-                    if (e.getCursor() == null || e.getCursor().getType() == Material.AIR) {
+                    if (repairInv.getItem(3) == null || repairInv.getItem(3).getType() == Material.AIR) {
                         cost = 0;
                     } else {
                         for (String type : config.getConfigurationSection("repair.cost").getKeys(false)) {
-                            if (e.getCursor().getType().toString().contains(type + "_")) {
+                            if (repairInv.getItem(3).getType().toString().contains(type + "_")) {
                                 cost = config.getInt("repair.cost." + type);
                             }
                         }
+                        cost = (int) Math.ceil(cost * getUsed(playerItem));
                     }
-                    cost *= getUsed(e.getCursor());
-                    updateLore(newConfirm, cost);
-                    repairInv.setItem(5, newConfirm);
-                    new BukkitRunnable() {
-                        public void run() {
-                            p.updateInventory();
+                    // Repair if we can
+                    if (p.getLevel() >= cost) {
+                        p.setLevel(p.getLevel() - cost);
+                        damagedMeta.setDamage(0);
+                        playerItem.setItemMeta((ItemMeta) damagedMeta);
+                        p.closeInventory();
+                        String soundText = config.getString("repair.sound");
+                        if (!soundText.equalsIgnoreCase("none")) {
+                            p.getWorld().playSound(p.getLocation(), Sound.valueOf(soundText), 1, 1);
                         }
-                    }.runTaskLater(AiriEnchanting.getPlugin(), 4);
-                } else {
-                    e.setCancelled(true);
-                    // Check if this is a repair event
-                    ItemStack playerItem = repairInv.getItem(3);
-                    if (e.getSlot() == 5 && playerItem != null && playerItem.hasItemMeta() && playerItem.getItemMeta() instanceof Damageable) {
-                        ItemMeta meta = playerItem.getItemMeta();
-                        Damageable damagedMeta = (Damageable) meta;
-                        int cost = 30;
-                        if (repairInv.getItem(3) == null || repairInv.getItem(3).getType() == Material.AIR) {
-                            cost = 0;
-                        } else {
-                            for (String type : config.getConfigurationSection("repair.cost").getKeys(false)) {
-                                if (repairInv.getItem(3).getType().toString().contains(type + "_")) {
-                                    cost = config.getInt("repair.cost." + type);
-                                }
-                            }
-                        }
-                        cost *= getUsed(repairInv.getItem(3));
-                        // Repair if we can
-                        if (p.getLevel() > cost) {
-                            p.setLevel(p.getLevel() - cost);
-                            damagedMeta.setDamage(0);
-                            p.closeInventory();
-                            playerItem.setItemMeta((ItemMeta) damagedMeta);
-                            String soundText = config.getString("repair.sound");
-                            if (!soundText.equalsIgnoreCase("none")) {
-                                p.getWorld().playSound(p.getLocation(), Sound.valueOf(soundText), 1, 1);
-                            }
-                        } else {
-                            p.sendMessage(ChatColor.RED + "You do not have enough levels to do that!");
-                            p.closeInventory();
-                        }
+                    } else {
+                        p.sendMessage(ChatColor.RED + "You do not have enough levels to do that!");
+                        p.closeInventory();
                     }
                 }
             }
+            // Update cost
+            new BukkitRunnable() {
+                public void run() {
+                    ItemStack newConfirm = Utils.getItem("repair.confirm");
+                    int cost = 30;
+                    ItemStack repairing = repairInv.getItem(3);
+                    if (repairing == null ||repairing.getType() == Material.AIR) {
+                        cost = 0;
+                    } else {
+                        for (String type : config.getConfigurationSection("repair.cost").getKeys(false)) {
+                            if (repairing.getType().toString().contains(type + "_")) {
+                                cost = config.getInt("repair.cost." + type);
+                            }
+                        }
+                        cost = (int) Math.ceil(cost * getUsed(repairing));
+                    }
+                    updateLore(newConfirm, cost);
+                    repairInv.setItem(5, newConfirm);
+                    p.updateInventory();
+                }
+            }.runTaskLater(AiriEnchanting.getPlugin(), 4);
         }
     }
 
@@ -173,25 +175,30 @@ public class RepairRenameInteractions implements Listener {
         Inventory renameInv = e.getView().getTopInventory();
         if (e.getView().getTitle().equalsIgnoreCase(renameTitle) && e.getClickedInventory().equals(renameInv) && e.getSlot() != 3) {
             e.setCancelled(true);
-            if (e.getSlot() == 5 && renameInv.getItem(3) != null) {
+            if (e.getSlot() == 5) {
                 Player p = (Player) e.getWhoClicked();
                 ItemStack playerItem = renameInv.getItem(3);
-                // Complete the action if they have enough levels
-                if (p.getLevel() > renameCost) {
-                    if (playerItem.getType() != Material.AIR) {
-                        p.setLevel(p.getLevel() - renameCost);
-                        renaming.put(p, playerItem);
-                        p.sendMessage(ChatColor.GREEN + "Enter the item's new name in chat");
-                        if (p.hasPermission("rename.color")) {
-                            p.sendMessage(ChatColor.GREEN + "Color codes are enabled!");
-                        } else {
-                            p.sendMessage(ChatColor.RED + "Color codes are disabled!");
+                if (playerItem != null) {
+                    // Complete the action if they have enough levels
+                    if (p.getLevel() > renameCost) {
+                        if (playerItem.getType() != Material.AIR) {
+                            p.setLevel(p.getLevel() - renameCost);
+                            renaming.put(p, playerItem);
+                            p.sendMessage(ChatColor.GREEN + "Enter the item's new name in chat");
+                            if (p.hasPermission("rename.color")) {
+                                p.sendMessage(ChatColor.GREEN + "Color codes are enabled!");
+                            } else {
+                                p.sendMessage(ChatColor.RED + "Color codes are disabled!");
+                            }
+                            p.closeInventory();
                         }
+                    } else {
                         p.closeInventory();
+                        p.sendMessage(ChatColor.RED + "You do not have enough levels to do that!");
                     }
                 } else {
+                    p.sendMessage(ChatColor.RED + "There is no item to rename in the slot!");
                     p.closeInventory();
-                    p.sendMessage(ChatColor.RED + "You do not have enough levels to do that!");
                 }
             }
         }

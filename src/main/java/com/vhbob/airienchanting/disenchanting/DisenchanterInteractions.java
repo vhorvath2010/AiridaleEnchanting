@@ -105,8 +105,8 @@ public class DisenchanterInteractions implements Listener {
             if (e.getClickedInventory() == disenchanter) {
                 if (e.getSlot() != 3)
                     e.setCancelled(true);
+                final Player p = (Player) e.getWhoClicked();
                 if (e.getSlot() == 5) {
-                    final Player p = (Player) e.getWhoClicked();
                     if (disenchanter.getItem(3) != null) {
                         final ItemStack playerItem = disenchanter.getItem(3);
                         // Stop if no enchantments
@@ -128,6 +128,9 @@ public class DisenchanterInteractions implements Listener {
                             }
                         }.runTaskLater(AiriEnchanting.getPlugin(), 60);
                         avoidGive.add(p);
+                        p.closeInventory();
+                    } else {
+                        p.sendMessage(ChatColor.RED + "There is no item in the disenchanter!");
                         p.closeInventory();
                     }
                 }
@@ -174,6 +177,9 @@ public class DisenchanterInteractions implements Listener {
                             }
                         }.runTaskLater(AiriEnchanting.getPlugin(), 80);
                         avoidGive.add(p);
+                        p.closeInventory();
+                    } else {
+                        p.sendMessage(ChatColor.RED + "There is no item in the disenchanter!");
                         p.closeInventory();
                     }
                 }

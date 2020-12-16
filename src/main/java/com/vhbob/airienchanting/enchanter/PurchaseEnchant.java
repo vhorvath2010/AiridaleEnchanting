@@ -33,7 +33,7 @@ public class PurchaseEnchant implements Listener {
                 enchantKey = ChatColor.stripColor(enchantKey).toLowerCase();
                 Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantKey));
                 String costString = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
-                costString = costString.replace("Level " + level + ": ", "").replace(" Tokens", "");
+                costString = costString.replace("Level " + level + ": ", "").replace(" Souls", "");
                 int cost = Integer.parseInt(costString);
                 // Ensure they do not have any mutually exclusive enchants
                 Inventory playerInv = e.getView().getBottomInventory();
@@ -56,9 +56,9 @@ public class PurchaseEnchant implements Listener {
                 }
                 // Buy enchantment, if play can afford it
                 if (cancelled) {
-                    e.getWhoClicked().sendMessage(ChatColor.RED + "Your item has a mutually exclusive enchantment! This enchantment may not be added.");
+                    e.getWhoClicked().sendMessage(ChatColor.RED + "That enchantment conflicts with another already on this item!");
                 } else if (cost > countTokens(playerInv)) {
-                    e.getWhoClicked().sendMessage(ChatColor.RED + "You do not have enough tokens in your inventory!");
+                    e.getWhoClicked().sendMessage(ChatColor.RED + "You do not have enough souls in your inventory!");
                 } else if (level - playerItem.getEnchantmentLevel(enchantment) > 1) {
                     e.getWhoClicked().sendMessage(ChatColor.RED + "You must unlock the pervious level first!");
                 } else {
