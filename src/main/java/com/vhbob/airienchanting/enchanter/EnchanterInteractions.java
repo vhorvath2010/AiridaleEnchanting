@@ -82,7 +82,7 @@ public class EnchanterInteractions implements Listener {
             } else if (e.getSlot() == 19 && e.getClick().isShiftClick() && e.getClickedInventory().equals(e.getView().getTopInventory())) {
                 updateEnchantments(enchanter, null, 1, p);
             } else if (e.getClick().isShiftClick() && e.getClickedInventory().equals(e.getView().getBottomInventory())
-                    && (e.getView().getTopInventory().getItem(19) == null) || e.getView().getTopInventory().getItem(19).getType() == Material.AIR) {
+                    && e.getView().getTopInventory().getItem(19) == null) {
                 updateEnchantments(enchanter, e.getCurrentItem(), 1, p);
             }
             new BukkitRunnable() {
