@@ -60,7 +60,7 @@ public class PurchaseEnchant implements Listener {
                 } else if (cost > countTokens(playerInv)) {
                     e.getWhoClicked().sendMessage(ChatColor.RED + "You do not have enough souls in your inventory!");
                 } else if (level - playerItem.getEnchantmentLevel(enchantment) > 1) {
-                    e.getWhoClicked().sendMessage(ChatColor.RED + "You must unlock the pervious level first!");
+                    e.getWhoClicked().sendMessage(ChatColor.RED + "You must unlock the previous level first!");
                 } else {
                     // Add enchantment
                     removeTokens(playerInv, cost);

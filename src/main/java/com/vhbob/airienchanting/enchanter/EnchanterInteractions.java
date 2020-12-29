@@ -70,19 +70,26 @@ public class EnchanterInteractions implements Listener {
             if (e.getClickedInventory().equals(e.getView().getTopInventory()) && e.getSlot() != 19) {
                 e.setCancelled(true);
             }
+            // Stop swaps
+            if (e.getSlot() == 19 && e.getClickedInventory().equals(e.getView().getTopInventory()) && e.getCurrentItem() != null
+            && e.getCursor() != null && e.getCursor().getType() != Material.AIR) {
+                e.setCancelled(true);
+                return;
+            }
             Inventory enchanter = e.getView().getTopInventory();
             if (e.getSlot() == 19) {
                 updateEnchantments(enchanter, e.getCursor(), 1, p);
             } else if (e.getSlot() == 19 && e.getClick().isShiftClick() && e.getClickedInventory().equals(e.getView().getTopInventory())) {
                 updateEnchantments(enchanter, null, 1, p);
-            } else if (e.getClick().isShiftClick() && e.getClickedInventory().equals(e.getView().getBottomInventory())) {
+            } else if (e.getClick().isShiftClick() && e.getClickedInventory().equals(e.getView().getBottomInventory())
+                    && (e.getView().getTopInventory().getItem(19) == null) || e.getView().getTopInventory().getItem(19).getType() == Material.AIR) {
                 updateEnchantments(enchanter, e.getCurrentItem(), 1, p);
             }
             new BukkitRunnable() {
                 public void run() {
                     p.updateInventory();
                 }
-            }.runTaskLater(AiriEnchanting.getPlugin(), 4);
+            }.runTaskLater(AiriEnchanting.getPlugin(), 0);
         }
     }
 
@@ -111,7 +118,7 @@ public class EnchanterInteractions implements Listener {
     }
 
     // Update the inventory to display the proper enchants
-    private void updateEnchantments(Inventory enchanter, ItemStack item, int page, Player player) {
+    private void updateEnchantments(Inventory enchanter, ItemStack item, int page, final Player player) {
         if (item == null || item.getType() == Material.AIR) {
             for (int i = 0; i < enchanter.getSize(); ++i) {
                 if (i % 9 >= 3) {
