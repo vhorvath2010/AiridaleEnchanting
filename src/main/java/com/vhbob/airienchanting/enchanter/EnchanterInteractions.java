@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class EnchanterInteractions implements Listener {
@@ -29,6 +30,7 @@ public class EnchanterInteractions implements Listener {
     private static HashMap<Player, Block> interaction;
     private static String enchanterTitle = ChatColor.translateAlternateColorCodes('&', config.getString("enchanting.title"));
     private static HashMap<Player, Integer> pages;
+    private static ArrayList<Player> cd;
     private static ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1);
     private static ItemStack nextPage = Utils.getItem("enchanting.next_page");
     private static ItemStack prevPage = Utils.getItem("enchanting.prev_page");
@@ -36,6 +38,7 @@ public class EnchanterInteractions implements Listener {
     public EnchanterInteractions() {
         interaction = new HashMap<Player, Block>();
         pages = new HashMap<Player, Integer>();
+        cd = new ArrayList<Player>();
     }
 
     @EventHandler
@@ -67,6 +70,20 @@ public class EnchanterInteractions implements Listener {
     public void onUse(InventoryClickEvent e) {
         if (e.getView().getTitle().equals(enchanterTitle) && e.getClickedInventory() != null) {
             final Player p = (Player) e.getWhoClicked();
+            // Check for double clicks that cause errors
+            if (e.getClickedInventory().equals(e.getView().getTopInventory())) {
+                if (cd.contains(p)) {
+                    e.setCancelled(true);
+                    p.sendMessage(ChatColor.RED + "Please wait before clicking again!");
+                    return;
+                }
+                cd.add(p);
+                new BukkitRunnable() {
+                    public void run() {
+                        cd.remove(p);
+                    }
+                }.runTaskLater(AiriEnchanting.getPlugin(), 20);
+            }
             if (e.getClickedInventory().equals(e.getView().getTopInventory()) && e.getSlot() != 19) {
                 e.setCancelled(true);
             }
