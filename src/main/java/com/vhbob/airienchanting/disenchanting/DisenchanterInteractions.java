@@ -235,7 +235,7 @@ public class DisenchanterInteractions implements Listener {
 
     private double getChance(ItemStack item) {
         for (String type : config.getConfigurationSection("disenchanting.unsafe_odds").getKeys(false)) {
-            if (item.getType().toString().contains(type.toUpperCase() + "_")) {
+            if (item.getType().toString().contains(type.toUpperCase() + "_") || item.getType().toString().equalsIgnoreCase(type)) {
                 return config.getInt("disenchanting.unsafe_odds." + type);
             }
         }
