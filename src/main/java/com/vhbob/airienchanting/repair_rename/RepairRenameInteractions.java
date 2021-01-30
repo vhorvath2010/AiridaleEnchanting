@@ -1,12 +1,20 @@
 package com.vhbob.airienchanting.repair_rename;
 
+import com.jojodmo.itembridge.ItemBridge;
+import com.jojodmo.itembridge.ItemBridgeKey;
 import com.vhbob.airienchanting.AiriEnchanting;
 import com.vhbob.airienchanting.util.Utils;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +30,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -37,9 +47,11 @@ public class RepairRenameInteractions implements Listener {
     private final String renameTitle = ChatColor.translateAlternateColorCodes('&', config.getString("rename.title"));
     private final int renameCost = config.getInt("rename.cost");
     private HashMap<Player, ItemStack> renaming;
+    private ArrayList<Player> cuiRepair;
 
     public RepairRenameInteractions() {
         renaming = new HashMap<Player, ItemStack>();
+        cuiRepair = new ArrayList<Player>();
     }
 
     @EventHandler
@@ -133,8 +145,32 @@ public class RepairRenameInteractions implements Listener {
                     // Repair if we can
                     if (p.getLevel() >= cost) {
                         p.setLevel(p.getLevel() - cost);
-                        damagedMeta.setDamage(0);
-                        playerItem.setItemMeta((ItemMeta) damagedMeta);
+                        // Repair custom item or regular item
+                        ItemBridgeKey key = ItemBridge.getItemKey(playerItem);
+                        if (key != null && key.getNamespace().equalsIgnoreCase("customitems")) {
+                            // Swap hand items
+                            ItemStack hand = p.getInventory().getItemInMainHand();
+                            String permString = config.getString("repair_cui_perm");
+                            // Run command
+                            p.getInventory().setItemInMainHand(playerItem);
+                            if (!p.hasPermission(permString)) {
+                                User user = LuckPermsProvider.get().getUserManager().getUser(p.getUniqueId());
+                                Node node = Node.builder(permString).build();
+                                user.data().add(node);
+                                Bukkit.dispatchCommand(p, config.getString("repair_cui_cmd"));
+                                user.data().remove(node);
+                            } else {
+                                Bukkit.dispatchCommand(p, config.getString("repair_cui_cmd"));
+                            }
+                            // Reset hand
+                            ItemStack repairedCUI = p.getInventory().getItemInMainHand();
+                            p.getInventory().setItemInMainHand(hand);
+                            p.getInventory().addItem(repairedCUI);
+                            cuiRepair.add(p);
+                        } else {
+                            damagedMeta.setDamage(0);
+                            playerItem.setItemMeta((ItemMeta) damagedMeta);
+                        }
                         p.closeInventory();
                         String soundText = config.getString("repair.sound");
                         if (!soundText.equalsIgnoreCase("none")) {
@@ -248,7 +284,7 @@ public class RepairRenameInteractions implements Listener {
     public void saveItems(InventoryCloseEvent e) {
         if (e.getView().getTitle().equalsIgnoreCase(repairTitle) || e.getView().getTitle().equalsIgnoreCase(renameTitle)) {
             ItemStack pItem = e.getView().getTopInventory().getItem(3);
-            if (pItem != null && !renaming.containsKey(e.getPlayer())) {
+            if (pItem != null && !renaming.containsKey(e.getPlayer()) && !cuiRepair.remove(e.getPlayer())) {
                 e.getPlayer().getInventory().addItem(pItem);
             }
         }

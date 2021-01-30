@@ -1,9 +1,12 @@
 name: AiridaleEnchanting
 description: An enchanting system for AiridaleMC
 main: com.vhbob.airienchanting.AiriEnchanting
-version: 1.1.4
+version: 1.2.1
 author: Vhbob
 api-version: 1.16
+depend:
+  - ItemBridge
+  - LuckPerms
 commands:
   ebook:
     aliases: [enchantbook, ebookgive, giveebook]

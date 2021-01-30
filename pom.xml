@@ -6,7 +6,19 @@
 
     <groupId>com.vhbob</groupId>
     <artifactId>AiridaleEnchanting</artifactId>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.2.1-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <repositories>
         <!-- This adds the Spigot Maven repository to the build -->
@@ -22,6 +34,13 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.16.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

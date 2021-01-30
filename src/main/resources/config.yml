@@ -20,6 +20,10 @@ exclusive_groups:
     - fortune
     - silk_touch
 
+# This controls the command to repair custom items
+repair_cui_cmd: "cui repair hand"
+repair_cui_perm: "customitems.repair"
+
 # To add tools to the enchanting category, please add the tool type name
 # found https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
 # Please exclude material types. For example, pickaxe enchantments are under
