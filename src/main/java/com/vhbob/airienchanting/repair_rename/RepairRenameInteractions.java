@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -231,6 +232,15 @@ public class RepairRenameInteractions implements Listener {
             } else {
                 p.sendMessage(ChatColor.RED + "That name is too long! Try again!");
             }
+        }
+    }
+
+    @EventHandler
+    public void dcWhileRenaming(PlayerQuitEvent e) {
+        Player p = e.getPlayer();
+        if (renaming.containsKey(p)) {
+            // Give item they were renaming
+            p.getInventory().addItem(renaming.get(p));
         }
     }
 
