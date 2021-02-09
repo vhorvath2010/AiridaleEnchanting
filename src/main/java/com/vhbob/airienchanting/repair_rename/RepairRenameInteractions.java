@@ -290,6 +290,11 @@ public class RepairRenameInteractions implements Listener {
         }
     }
 
+    @EventHandler
+    public void onDC(PlayerQuitEvent e) {
+        e.getPlayer().closeInventory();
+    }
+
     // Get the percentage durability of an item
     private double getUsed(ItemStack itemStack) {
         if (itemStack.getItemMeta() instanceof Damageable) {
