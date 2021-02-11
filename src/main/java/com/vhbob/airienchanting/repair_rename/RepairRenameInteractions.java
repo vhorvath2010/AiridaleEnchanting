@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
@@ -292,8 +293,13 @@ public class RepairRenameInteractions implements Listener {
     }
 
     @EventHandler
-    public void onDie(PlayerDeathEvent e) {
-        e.getEntity().closeInventory();
+    public void preDie(EntityDamageEvent e) {
+        if (e.getEntity() instanceof Player) {
+            Player player = (Player) e.getEntity();
+            if (e.getFinalDamage() >= player.getHealth()) {
+                player.closeInventory();
+            }
+        }
     }
 
     // Get the percentage durability of an item
