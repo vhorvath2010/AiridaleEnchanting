@@ -212,7 +212,8 @@ public class RepairRenameInteractions implements Listener {
     public void purchaseRename(InventoryClickEvent e) {
         // Check if the user clicked the confirm button
         Inventory renameInv = e.getView().getTopInventory();
-        if (e.getView().getTitle().equalsIgnoreCase(renameTitle) && e.getClickedInventory().equals(renameInv) && e.getSlot() != 3) {
+        if (e.getView().getTitle().equalsIgnoreCase(renameTitle) &&
+                e.getClickedInventory() != null && e.getClickedInventory().equals(renameInv) && e.getSlot() != 3) {
             e.setCancelled(true);
             if (e.getSlot() == 5) {
                 Player p = (Player) e.getWhoClicked();
