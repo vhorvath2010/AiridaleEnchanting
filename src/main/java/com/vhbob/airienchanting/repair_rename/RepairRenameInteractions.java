@@ -255,6 +255,13 @@ public class RepairRenameInteractions implements Listener {
             if (name.length() <= config.getInt("rename.max_length")) {
                 ItemStack playerItem = renaming.get(p);
                 ItemMeta itemMeta = playerItem.getItemMeta();
+                // Remove invalid color codes
+                String[] invalid = {"&k", "&l", "&m", "&n", "&o"};
+                if (!p.hasPermission("rename.styles")) {
+                    for (String code : invalid) {
+                        name = name.replace(code, "");
+                    }
+                }
                 if (p.hasPermission("rename.color")) {
                     itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
                 } else {
