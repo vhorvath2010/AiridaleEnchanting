@@ -256,20 +256,23 @@ public class RepairRenameInteractions implements Listener {
                 ItemStack playerItem = renaming.get(p);
                 ItemMeta itemMeta = playerItem.getItemMeta();
                 // Remove invalid color codes
-                String[] invalid = {"&k", "&l", "&m", "&n", "&o"};
-                if (!p.hasPermission("rename.styles")) {
-                    for (String code : invalid) {
-                        name = name.replace(code, "");
+                String[] codes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a",
+                        "b", "c", "d", "e", "f", "k", "l", "m", "n", "o", "r"};
+                for (String code : codes) {
+                    if (name.contains("&" + code)) {
+                        if (!p.hasPermission("rename.&" + code)) {
+                            name = name.replace("&" + code, "");
+                            p.sendMessage(ChatColor.RED + "Sorry, but you do not have access to &" + code + "!" +
+                                    " Please try another");
+                            return;
+                        }
                     }
                 }
-                if (p.hasPermission("rename.color")) {
-                    itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-                } else {
-                    itemMeta.setDisplayName(name);
-                }
+                // Do renaming
+                renaming.remove(p);
+                itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
                 playerItem.setItemMeta(itemMeta);
                 p.getInventory().addItem(playerItem);
-                renaming.remove(p);
                 p.sendMessage(ChatColor.GREEN + "Rename successful!");
                 String soundText = config.getString("rename.sound");
                 if (!soundText.equalsIgnoreCase("none")) {
