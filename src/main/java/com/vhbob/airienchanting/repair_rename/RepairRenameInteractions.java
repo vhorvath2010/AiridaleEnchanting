@@ -39,6 +39,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class RepairRenameInteractions implements Listener {
 
@@ -259,9 +260,8 @@ public class RepairRenameInteractions implements Listener {
                 String[] codes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a",
                         "b", "c", "d", "e", "f", "k", "l", "m", "n", "o", "r"};
                 for (String code : codes) {
-                    if (name.contains("&" + code)) {
+                    if (name.toLowerCase().contains("&" + code)) {
                         if (!p.hasPermission("rename.&" + code)) {
-                            name = name.replace("&" + code, "");
                             p.sendMessage(ChatColor.RED + "Sorry, but you do not have access to &" + code + "!" +
                                     " Please try another");
                             return;
